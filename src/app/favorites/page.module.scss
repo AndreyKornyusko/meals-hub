@@ -1,21 +1,95 @@
-.container{
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+.title {
+  text-align: center;
+  margin-bottom: 20px;
+}
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  list-style: none;
+  margin-bottom: 20px;
 }
 
 .card {
-    width: 300px;
-    height: 300px;
-    border: 1px solid #ddd;
-    text-align: center;
-    padding: 10px;
-    margin: 10px;
-    img {
-      width: 100%;
-      height: 150px;
-      object-fit: cover;
-      margin-bottom: 15px;
+  width: 300px;
+  height: auto;
+  border: 1px solid #ddd;
+  text-align: center;
+  padding: 10px;
+  margin: 10px;
+  h3 {
+    margin-bottom: 15px;
+  }
+  img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    margin-bottom: 15px;
+  }
+  .instructions {
+    margin-bottom: 20px;
+  }
+  .btnWrap {
+    display: flex;
+    justify-content: center;
+    width: 200px;
+    margin: 0 auto;
+    .button {
+      width: auto;
+      border-radius: 5px;
+      border: none;
+      padding: 5px;
+      background-color: rgb(59, 59, 183);
+      &:hover {
+        background-color: rgb(65, 81, 230);
+      }
+      color: white;
+      font-size: 14px;
+      cursor: pointer;
     }
   }
+}
 
+.ingredientsList {
+  list-style: none;
+  padding: 0;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 800px;
+  background: #f9f9f9;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.ingredientsTitle {
+  text-align: center;
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+.ingredientItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+
+  &:nth-child(odd) {
+    background: #f0f0f0;
+  }
+}
