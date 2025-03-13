@@ -5,22 +5,20 @@ import { fetchMeals } from "../../../../lib/api";
 import { Meal } from "../../../../ interfaces/data";
 import styles from "./page.module.scss";
 
-interface RecipePageProps {
-    params: { id: string | string[] };
-  }
-export default function RecipePage({ params }: RecipePageProps) {
+type Params = Promise<{ id: string }>
+export default async function RecipePage({ params }: { params: Params }) {
   const [meal, setMeal] = useState<Meal | null>(null);
-
+  const { id } = await params;
   useEffect(() => {
     async function fetchData() {
       const data = await fetchMeals();
-      const foundMeal = data.meals.find((m: Meal) => m.idMeal === params.id);
+      const foundMeal = data.meals.find((m: Meal) => m.idMeal === id);
 
       setMeal(foundMeal || null);
     }
 
     fetchData();
-  }, [params.id]);
+  }, [id]);
 
   if (!meal) return <p>Рецепт не знайдено</p>;
 
