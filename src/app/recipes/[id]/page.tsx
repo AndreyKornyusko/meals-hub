@@ -1,25 +1,29 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useParams } from "next/navigation"; 
 import { fetchMeals } from "../../../../lib/api";
 import { Meal } from "../../../../ interfaces/data";
 import styles from "./page.module.scss";
 
-interface RecipePageProps {
-  params: { id: any };
-}export default  function RecipePage({ params }: RecipePageProps) {
+
+export default  function RecipePage() {
+
+  const params = useParams();
+  const {id} = params;
+
   const [meal, setMeal] = useState<Meal | null>(null);
 
   useEffect(() => {
     async function fetchData() {
       const data = await fetchMeals();
-      const foundMeal = data.meals.find((m: Meal) => m.idMeal === params.id);
+      const foundMeal = data.meals.find((m: Meal) => m.idMeal === id);
 
       setMeal(foundMeal || null);
     }
 
     fetchData();
-  }, [params.id]);
+  }, [id]);
 
   if (!meal) return <p>Рецепт не знайдено</p>;
 
