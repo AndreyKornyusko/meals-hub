@@ -12,7 +12,7 @@ export function useFavorites() {
 
   // Add a new favorite
   const addFavorite = useMutation({
-    mutationFn: (meal: Meal) => {
+    mutationFn: async (meal: Meal) => {
       const updatedFavorites = [...favorites, meal];
       localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
       return updatedFavorites;
