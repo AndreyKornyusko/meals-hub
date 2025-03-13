@@ -38,7 +38,7 @@ export default function RecipePage({ params }: RecipePageProps) {
           .filter((ing) => ing.name)
           .map((ing, i) => (
             <li key={i} className={styles.item}>
-              {ing.name} - {ing.measure}
+              {ing.name} - <span className={styles.measure}>{ing.measure}</span>
             </li>
           ))}
       </ul>

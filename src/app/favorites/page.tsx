@@ -23,7 +23,7 @@ export default function FavoritesPage() {
 
   const ingredientsMap: Record<string, number> = {};
 
-  favorites.forEach((meal:Meal) => {
+  favorites.forEach((meal: Meal) => {
     extractIngredients(meal).forEach(({ name, measure }) => {
       const amount = parseFloat(measure) || 0;
       ingredientsMap[name] = (ingredientsMap[name] || 0) + amount;
@@ -37,17 +37,31 @@ export default function FavoritesPage() {
         {favorites.map((meal: Meal) => (
           <li key={meal.idMeal} className={styles.card}>
             <h3>{meal.strMeal}</h3>
-            <button onClick={() => removeFavorite.mutate(meal.idMeal)}>
-              Видалити
-            </button>
+            <img
+              className={styles.image}
+              src={meal.strMealThumb || "/placeholder.jpg"}
+              alt={meal.strMeal}
+            />
+            <h3>Інструкція</h3>
+            <p className={styles.instructions}>{meal.strInstructions}</p>
+            <div className={styles.btnWrap}>
+              <button
+                onClick={() => removeFavorite.mutate(meal.idMeal)}
+                className={styles.button}
+              >
+                Видалити
+              </button>
+            </div>
           </li>
         ))}
       </ul>
 
-      <ul>
+      <h2 className={styles.ingredientsTitle}>Список інгредієнтів</h2>
+
+      <ul className={styles.ingredientsList}>
         {Object.entries(ingredientsMap).map(([name, amount]) => (
-          <li key={name}>
-            {name}: {amount}
+          <li key={name} className={styles.ingredientItem}>
+            {name}: <strong>{amount}</strong>
           </li>
         ))}
       </ul>
