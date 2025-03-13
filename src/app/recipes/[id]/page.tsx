@@ -6,7 +6,7 @@ import { Meal } from "../../../../ interfaces/data";
 import styles from "./page.module.scss";
 
 interface RecipePageProps {
-    params: { id: string };
+    params: { id: string | string[] };
   }
 export default function RecipePage({ params }: RecipePageProps) {
   const [meal, setMeal] = useState<Meal | null>(null);
