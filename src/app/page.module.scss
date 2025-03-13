@@ -19,6 +19,11 @@
     padding: 5px;
     background-color: rgb(59, 59, 183);
     cursor: pointer;
+    &:hover {
+      background-color: rgb(65, 81, 230);
+    }
+    color: white;
+    font-size: 14px;
   }
 }
 
@@ -33,6 +38,7 @@
   flex-wrap: wrap;
   justify-content: center;
   list-style: none;
+  margin-bottom: 20px;
 }
 .card {
   width: 300px;
@@ -76,8 +82,15 @@
       }
       color: white;
       font-size: 14px;
+      cursor: pointer;
     }
   }
+}
+
+.paginatiionWrap {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
 
   .pagination {
     display: flex;
@@ -98,10 +111,6 @@
       }
     }
 
-    .pageItem {
-        width: 20px;
-    }
-
     .page {
       background: #fff;
       border: 1px solid #ddd;
@@ -109,14 +118,14 @@
       padding: 5px 10px;
       cursor: pointer;
       transition: all 0.2s ease-in-out;
+      color: black;
 
       &:hover {
         background: #f1f1f1;
       }
 
       &.active {
-        background: #ff5a5f;
-        color: #fff;
+        background: #6d5aff;
         border-color: #ff5a5f;
       }
     }
