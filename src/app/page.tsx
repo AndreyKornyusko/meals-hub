@@ -97,6 +97,7 @@ export default function HomePage() {
       <div className={styles.separator}>
         <div className={styles.category}>
           <select
+            className={styles.select}
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
           >
@@ -112,6 +113,7 @@ export default function HomePage() {
 
         <div className={styles.search}>
           <input
+            className={styles.input}
             type="text"
             placeholder="Пошук за назвою..."
             value={searchTerm}

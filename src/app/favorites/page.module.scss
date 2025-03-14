@@ -1,7 +1,24 @@
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 40px 20px;
+}
+.btnWrap {
+  display: flex;
+  justify-content: flex-end;
+  .button {
+    width: auto;
+    border-radius: 5px;
+    border: none;
+    padding: 5px;
+    background-color: rgb(59, 59, 183);
+    &:hover {
+      background-color: rgb(65, 81, 230);
+    }
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+  }
 }
 .title {
   text-align: center;
@@ -33,6 +50,9 @@
   }
   .instructions {
     margin-bottom: 20px;
+    max-height: 200px;
+    overflow-y: auto;
+    padding: 10px;
   }
   .btnWrap {
     display: flex;
