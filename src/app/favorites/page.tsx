@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useFavorites } from "../../../lib/useFavorites";
 import styles from "./page.module.scss";
 import { Meal } from "../../../ interfaces/data";
@@ -32,6 +33,11 @@ export default function FavoritesPage() {
 
   return (
     <div className={styles.container}>
+      <div className={styles.btnWrap}>
+        <Link href={`/`}>
+          <div className={styles.button}>До головної  &gt;</div>
+        </Link>
+      </div>
       <h1 className={styles.title}>Обрані рецепти</h1>
       <ul className={styles.list}>
         {favorites.map((meal: Meal) => (
@@ -56,7 +62,7 @@ export default function FavoritesPage() {
         ))}
       </ul>
 
-      <h2 className={styles.ingredientsTitle}>Список інгредієнтів</h2>
+      <h2 className={styles.ingredientsTitle}>Загальний список інгредієнтів</h2>
 
       <ul className={styles.ingredientsList}>
         {Object.entries(ingredientsMap).map(([name, amount]) => (
