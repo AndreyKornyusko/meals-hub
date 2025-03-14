@@ -24,12 +24,23 @@
   text-align: center;
   margin-bottom: 20px;
 }
+
+.content{
+  display: flex;
+  flex-wrap: nowrap;
+  .ingredientsListWrap{
+    width: 30%;
+    margin-left: 20px;
+  }
+}
+
 .list {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   list-style: none;
   margin-bottom: 20px;
+  width: 70%;
 }
 
 .card {
