@@ -90,7 +90,7 @@ export default function HomePage() {
 
       <div className={styles.favorites}>
         <Link href={`/favorites`}>
-          <div className={styles.button}>Обрані</div>
+          <div className={styles.button}>До обраних  &gt;</div>
         </Link>
       </div>
 

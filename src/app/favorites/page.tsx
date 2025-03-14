@@ -26,8 +26,13 @@ export default function FavoritesPage() {
 
   favorites.forEach((meal: Meal) => {
     extractIngredients(meal).forEach(({ name, measure }) => {
-      const amount = parseFloat(measure) || 0;
-      ingredientsMap[name] = (ingredientsMap[name] || 0) + amount;
+      if (!name) return;
+
+      const normalizedName = name.trim().toLowerCase();
+      const amount = parseFloat(measure) || 0; 
+
+      ingredientsMap[normalizedName] =
+        (ingredientsMap[normalizedName] || 0) + amount;
     });
   });
 
@@ -35,7 +40,7 @@ export default function FavoritesPage() {
     <div className={styles.container}>
       <div className={styles.btnWrap}>
         <Link href={`/`}>
-          <div className={styles.button}>До головної  &gt;</div>
+          <div className={styles.button}>До головної &gt;</div>
         </Link>
       </div>
       <h1 className={styles.title}>Обрані рецепти</h1>
