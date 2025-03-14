@@ -22,17 +22,30 @@ export default function FavoritesPage() {
 
   if (favorites.length === 0) return <p>Немає збережених рецептів</p>;
 
-  const ingredientsMap: Record<string, number> = {};
+  const ingredientsMap: Record<string, { amount: number; unit: string }> = {};
 
   favorites.forEach((meal: Meal) => {
     extractIngredients(meal).forEach(({ name, measure }) => {
-      if (!name) return;
+      if (!name || !measure) return;
 
-      const normalizedName = name.trim().toLowerCase();
-      const amount = parseFloat(measure) || 0; 
+      const normalizedName = name.trim().toLowerCase(); // Нормалізація назв
+      const parsedAmount = parseFloat(measure); // Виділяємо число
+      const unit = measure.replace(/[0-9.]/g, "").trim(); // Видаляємо число, залишаємо тільки одиницю вимірювання
 
-      ingredientsMap[normalizedName] =
-        (ingredientsMap[normalizedName] || 0) + amount;
+      if (!ingredientsMap[normalizedName]) {
+        ingredientsMap[normalizedName] = { amount: 0, unit };
+      }
+
+      // Якщо одиниці вимірювання однакові — додаємо
+      if (
+        ingredientsMap[normalizedName].unit === unit ||
+        !ingredientsMap[normalizedName].unit
+      ) {
+        ingredientsMap[normalizedName].amount += parsedAmount || 0;
+      } else {
+        // Якщо одиниці різні, не підсумовуємо
+        ingredientsMap[normalizedName] = { amount: parsedAmount || 0, unit };
+      }
     });
   });
 
@@ -70,9 +83,12 @@ export default function FavoritesPage() {
       <h2 className={styles.ingredientsTitle}>Загальний список інгредієнтів</h2>
 
       <ul className={styles.ingredientsList}>
-        {Object.entries(ingredientsMap).map(([name, amount]) => (
+        {Object.entries(ingredientsMap).map(([name, value]) => (
           <li key={name} className={styles.ingredientItem}>
-            {name}: <strong>{amount}</strong>
+            {name}:{" "}
+            <strong>
+              {value.amount} {value.unit}
+            </strong>
           </li>
         ))}
       </ul>
