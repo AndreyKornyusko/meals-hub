@@ -57,41 +57,46 @@ export default function FavoritesPage() {
         </Link>
       </div>
       <h1 className={styles.title}>Обрані рецепти</h1>
-      <ul className={styles.list}>
-        {favorites.map((meal: Meal) => (
-          <li key={meal.idMeal} className={styles.card}>
-            <h3>{meal.strMeal}</h3>
-            <img
-              className={styles.image}
-              src={meal.strMealThumb || "/placeholder.jpg"}
-              alt={meal.strMeal}
-            />
-            <h3>Інструкція</h3>
-            <p className={styles.instructions}>{meal.strInstructions}</p>
-            <div className={styles.btnWrap}>
-              <button
-                onClick={() => removeFavorite.mutate(meal.idMeal)}
-                className={styles.button}
-              >
-                Видалити
-              </button>
-            </div>
-          </li>
-        ))}
-      </ul>
+      <div className={styles.content}>
+        <ul className={styles.list}>
+          {favorites.map((meal: Meal) => (
+            <li key={meal.idMeal} className={styles.card}>
+              <h3>{meal.strMeal}</h3>
+              <img
+                className={styles.image}
+                src={meal.strMealThumb || "/placeholder.jpg"}
+                alt={meal.strMeal}
+              />
+              <h3>Інструкція</h3>
+              <p className={styles.instructions}>{meal.strInstructions}</p>
+              <div className={styles.btnWrap}>
+                <button
+                  onClick={() => removeFavorite.mutate(meal.idMeal)}
+                  className={styles.button}
+                >
+                  Видалити
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
+        <div className={styles.ingredientsListWrap}>
+          <h2 className={styles.ingredientsTitle}>
+            Загальний список інгредієнтів
+          </h2>
 
-      <h2 className={styles.ingredientsTitle}>Загальний список інгредієнтів</h2>
-
-      <ul className={styles.ingredientsList}>
-        {Object.entries(ingredientsMap).map(([name, value]) => (
-          <li key={name} className={styles.ingredientItem}>
-            {name}:{" "}
-            <strong>
-              {value.amount} {value.unit}
-            </strong>
-          </li>
-        ))}
-      </ul>
+          <ul className={styles.ingredientsList}>
+            {Object.entries(ingredientsMap).map(([name, value]) => (
+              <li key={name} className={styles.ingredientItem}>
+                {name}:{" "}
+                <strong>
+                  {value.amount} {value.unit}
+                </strong>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
     </div>
   );
 }
