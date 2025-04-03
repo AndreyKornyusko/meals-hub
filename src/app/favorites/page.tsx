@@ -9,15 +9,6 @@ interface Ingredient {
   measure: string;
 }
 
-function extractIngredients(meal: any): Ingredient[] {
-  return Array.from({ length: 20 }, (_, i) => i + 1)
-    .map((i) => ({
-      name: meal[`strIngredient${i}`]?.trim(),
-      measure: meal[`strMeasure${i}`]?.trim(),
-    }))
-    .filter((ing) => ing.name && ing.name !== "");
-}
-
 export default function FavoritesPage() {
   const { favorites, removeFavorite } = useFavorites();
 
