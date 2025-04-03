@@ -4,6 +4,12 @@ export async function fetchMeals() {
     return res.json();
   }
 
+  export async function fetchMeal(id: string) {
+    const res = await fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`);
+    if (!res.ok) throw new Error("fetch failed");
+    return res.json();
+  }
+
   export async function searchMeals(query: string) {
     const res = await fetch(
       `https://www.themealdb.com/api/json/v1/1/search.php?s=${query}`
