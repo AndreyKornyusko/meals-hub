@@ -1,85 +1,78 @@
 "use client";
-import React, { useState, useEffect, useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { fetchMeals, searchMeals } from "../../lib/api";
+import React, { useEffect, useMemo } from "react";
 import { useFavorites } from "../../lib/useFavorites";
 import { useDebounce } from "../../lib/useDebounce";
+import { useSearchMeals } from "../../lib/useSearchMeals";
+import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import styles from "./page.module.scss";
+import { usePagination } from "../../lib/usePagination";
+import { useMeals } from "../../lib/useMeals";
 import { Meal } from "../../ interfaces/data";
 
-const ITEMS_PER_PAGE = 6;
+import styles from "./page.module.scss";
+
 export default function HomePage() {
   const { favorites, addFavorite } = useFavorites();
+  const { meals, error, isLoading } = useMeals();
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
-  // Стан для категорії та пошуку
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
-  const [searchTerm, setSearchTerm] = useState<string>("");
+  // Отримання параметрів із URL
+  const selectedCategory = searchParams.get("category") || "";
+  const searchTerm = searchParams.get("search") || "";
+  const currentPage = parseInt(searchParams.get("page") || "1", 10);
 
-  // Дебаунс для введеного тексту
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
-  const [currentPage, setCurrentPage] = useState<number>(1);
+  const { searchResults } = useSearchMeals(debouncedSearchTerm);
 
-  // Запит на отримання всіх страв
-  const {
-    data: mealsData,
-    error,
-    isLoading,
-  } = useQuery({
-    queryKey: ["meals"],
-    queryFn: fetchMeals,
-    staleTime: 1000 * 60 * 5,
-  });
-
-  // Запит на пошук страв за назвою
-  const { data: searchResults, refetch } = useQuery({
-    queryKey: ["searchMeals", debouncedSearchTerm],
-    queryFn: () => searchMeals(debouncedSearchTerm),
-    enabled: !!debouncedSearchTerm, // Запит виконується тільки при введенні тексту
-  });
-
-  // Викликаємо `refetch` щоразу, коли змінюється `debouncedSearchTerm`
-  useEffect(() => {
-    if (debouncedSearchTerm) {
-      refetch();
-    }
-  }, [debouncedSearchTerm, refetch]);
+  // Оновлення URL при зміні параметрів
+  const updateSearchParams = (params: Record<string, string | null | undefined>) => {
+    const newParams = new URLSearchParams(searchParams);
+    Object.entries(params).forEach(([key, value]) => {
+      if (value) {
+        newParams.set(key, value);
+      } else {
+        newParams.delete(key);
+      }
+    });
+    router.push(`?${newParams.toString()}`, { scroll: false });
+  };
 
   const mealsToShow = useMemo(() => {
     const allMeals = debouncedSearchTerm
-      ? Array.isArray(searchResults?.meals)
-        ? searchResults.meals
+      ? Array.isArray(searchResults)
+        ? searchResults
         : []
-      : Array.isArray(mealsData?.meals)
-      ? mealsData.meals
+      : Array.isArray(meals)
+      ? meals
       : [];
 
-    return Array.isArray(allMeals)
-      ? allMeals.filter((meal: Meal) =>
-          selectedCategory
-            ? meal.strCategory?.toLowerCase() === selectedCategory.toLowerCase()
-            : true
-        )
-      : [];
-  }, [searchResults, mealsData, selectedCategory, debouncedSearchTerm]);
+    return allMeals.filter((meal: Meal) =>
+      selectedCategory
+        ? meal.strCategory?.toLowerCase() === selectedCategory.toLowerCase()
+        : true
+    );
+  }, [searchResults, meals, selectedCategory, debouncedSearchTerm]);
 
-  const totalPages = Math.ceil(mealsToShow.length / ITEMS_PER_PAGE);
+  const {
+    currentPage: page,
+    totalPages,
+    setCurrentPage,
+    displayedItems,
+  } = usePagination(mealsToShow.length);
 
   useEffect(() => {
-    if (currentPage > totalPages) setCurrentPage(1);
+    if (page > totalPages) setCurrentPage(1);
   }, [totalPages]);
 
   const displayedMeals = useMemo(() => {
-    const start = (currentPage - 1) * ITEMS_PER_PAGE;
-    return mealsToShow.slice(start, start + ITEMS_PER_PAGE);
-  }, [mealsToShow, currentPage]);
+    return mealsToShow.slice(displayedItems.start, displayedItems.end);
+  }, [mealsToShow, displayedItems]);
 
   const categories = useMemo(() => {
-    if (!mealsData?.meals) return [];
-    return Array.from(
-      new Set(mealsData.meals.map((meal: Meal) => meal.strCategory))
-    ) as string[];
-  }, [mealsData]);
+    if (!meals) return [];
+    return Array.from(new Set(meals.map((meal: Meal) => meal.strCategory))) as string[];
+  }, [meals]);
 
   if (isLoading) return <p>Loading...</p>;
   if (error) return <p>error: {error.message}</p>;
@@ -90,7 +83,7 @@ export default function HomePage() {
 
       <div className={styles.favorites}>
         <Link href={`/favorites`}>
-          <div className={styles.button}>До обраних  &gt;</div>
+          <div className={styles.button}>До обраних &gt;</div>
         </Link>
       </div>
 
@@ -99,15 +92,14 @@ export default function HomePage() {
           <select
             className={styles.select}
             value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
+            onChange={(e) => updateSearchParams({ category: e.target.value, page: "1" })}
           >
             <option value="">Усі категорії</option>
-            {categories &&
-              categories.map((category) => (
-                <option key={category} value={category}>
-                  {category}
-                </option>
-              ))}
+            {categories.map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -117,7 +109,7 @@ export default function HomePage() {
             type="text"
             placeholder="Пошук за назвою..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => updateSearchParams({ search: e.target.value, page: "1" })}
           />
         </div>
       </div>
@@ -126,14 +118,9 @@ export default function HomePage() {
         {displayedMeals.length > 0 ? (
           displayedMeals.map((meal: Meal) => (
             <li key={meal.idMeal} className={styles.card}>
-              <img
-                src={meal.strMealThumb || "/placeholder.jpg"}
-                alt={meal.strMeal}
-              />
+              <img src={meal.strMealThumb || "/placeholder.jpg"} alt={meal.strMeal} />
               <h3 className={styles.title}>{meal.strMeal}</h3>
-              <p className={styles.subtitle}>
-                {meal.strCategory} | {meal.strArea}
-              </p>
+              <p className={styles.subtitle}>{meal.strCategory} | {meal.strArea}</p>
               <div className={styles.btnWrap}>
                 <button
                   onClick={() => addFavorite.mutate(meal)}
@@ -154,43 +141,23 @@ export default function HomePage() {
         )}
       </ul>
 
-      {/* Пагинация */}
+      {/* Пагінація */}
       <div className={styles.paginatiionWrap}>
         {totalPages > 1 && (
           <div className={styles.pagination}>
-            <button
-              className={styles.arrow}
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage((prev) => prev - 1)}
-            >
+            <button className={styles.arrow} disabled={page === 1} onClick={() => setCurrentPage(page - 1)}>
               &lt;
             </button>
-
-            {Array.from({ length: totalPages }, (_, i) => i + 1)
-              .filter((page) => {
-                return page <= 7 || page === totalPages || page === currentPage;
-              })
-              .map((page, index, arr) => (
-                <React.Fragment key={page}>
-                  {index > 0 && page !== arr[index - 1] + 1 && (
-                    <span className={styles.dots}>...</span>
-                  )}
-                  <button
-                    className={`${styles.page} ${
-                      currentPage === page ? styles.active : ""
-                    }`}
-                    onClick={() => setCurrentPage(page)}
-                  >
-                    {page}
-                  </button>
-                </React.Fragment>
-              ))}
-
-            <button
-              className={styles.arrow}
-              disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage((prev) => prev + 1)}
-            >
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+              <button
+                key={pageNum}
+                className={`${styles.page} ${page === pageNum ? styles.active : ""}`}
+                onClick={() => setCurrentPage(pageNum)}
+              >
+                {pageNum}
+              </button>
+            ))}
+            <button className={styles.arrow} disabled={page === totalPages} onClick={() => setCurrentPage(page + 1)}>
               &gt;
             </button>
           </div>

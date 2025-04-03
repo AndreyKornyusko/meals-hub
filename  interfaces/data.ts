@@ -52,4 +52,5 @@ export interface Meal {
     strImageSource: string | null;
     strCreativeCommonsConfirmed: string | null;
     dateModified: string | null;
+    ingredients?: { name: string; measure: string }[];
 }
