@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useMemo } from "react";
+import React, {Suspense, useEffect, useMemo, useState } from "react";
 import { useFavorites } from "../../lib/useFavorites";
 import { useDebounce } from "../../lib/useDebounce";
 import { useSearchMeals } from "../../lib/useSearchMeals";
@@ -11,21 +11,16 @@ import { Meal } from "../../ interfaces/data";
 
 import styles from "./page.module.scss";
 
-export default function HomePage() {
-  const { favorites, addFavorite } = useFavorites();
-  const { meals, error, isLoading } = useMeals();
+const useUpdatedSearchParams = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  // Отримання параметрів із URL
+  // Отримання параметрів з URL
   const selectedCategory = searchParams.get("category") || "";
   const searchTerm = searchParams.get("search") || "";
   const currentPage = parseInt(searchParams.get("page") || "1", 10);
 
-  const debouncedSearchTerm = useDebounce(searchTerm, 300);
-  const { searchResults } = useSearchMeals(debouncedSearchTerm);
-
-  // Оновлення URL при зміні параметрів
+  // Оновлення URL с новими параметрами
   const updateSearchParams = (params: Record<string, string | null | undefined>) => {
     const newParams = new URLSearchParams(searchParams);
     Object.entries(params).forEach(([key, value]) => {
@@ -38,20 +33,42 @@ export default function HomePage() {
     router.push(`?${newParams.toString()}`, { scroll: false });
   };
 
+  return {
+    selectedCategory,
+    searchTerm,
+    currentPage,
+    updateSearchParams,
+  };
+};
+
+const HomePageContent = () => {
+  const { favorites, addFavorite } = useFavorites();
+  const { meals, error, isLoading } = useMeals();
+  const { selectedCategory, searchTerm, updateSearchParams } = useUpdatedSearchParams();
+
+  const [localSearchTerm, setLocalSearchTerm] = useState(searchTerm); 
+  const debouncedSearchTerm = useDebounce(localSearchTerm, 300);
+  const { searchResults } = useSearchMeals(debouncedSearchTerm);
+
+
+  // Фильтрація та пошук по категоріям
   const mealsToShow = useMemo(() => {
+  
     const allMeals = debouncedSearchTerm
-      ? Array.isArray(searchResults)
-        ? searchResults
+      ? Array.isArray(searchResults?.meals)
+        ? searchResults?.meals
         : []
       : Array.isArray(meals)
       ? meals
       : [];
-
-    return allMeals.filter((meal: Meal) =>
+    
+    const filteredMeals = allMeals.filter((meal: Meal) =>
       selectedCategory
         ? meal.strCategory?.toLowerCase() === selectedCategory.toLowerCase()
         : true
     );
+    
+    return filteredMeals;
   }, [searchResults, meals, selectedCategory, debouncedSearchTerm]);
 
   const {
@@ -73,6 +90,12 @@ export default function HomePage() {
     if (!meals) return [];
     return Array.from(new Set(meals.map((meal: Meal) => meal.strCategory))) as string[];
   }, [meals]);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newSearchTerm = e.target.value;
+    setLocalSearchTerm(newSearchTerm); 
+    updateSearchParams({ search: newSearchTerm, page: "1" });  
+  };
 
   if (isLoading) return <p>Loading...</p>;
   if (error) return <p>error: {error.message}</p>;
@@ -108,8 +131,8 @@ export default function HomePage() {
             className={styles.input}
             type="text"
             placeholder="Пошук за назвою..."
-            value={searchTerm}
-            onChange={(e) => updateSearchParams({ search: e.target.value, page: "1" })}
+            value={localSearchTerm}  
+            onChange={handleSearchChange}  
           />
         </div>
       </div>
@@ -164,5 +187,13 @@ export default function HomePage() {
         )}
       </div>
     </div>
+  );
+};
+
+export default function HomePage() {
+  return (
+    <Suspense fallback={<p>Loading...</p>}>
+      <HomePageContent />
+    </Suspense>
   );
 }
