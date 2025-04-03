@@ -17,6 +17,7 @@ function extractIngredients(meal: any): Ingredient[] {
     }))
     .filter((ing) => ing.name && ing.name !== "");
 }
+
 export default function FavoritesPage() {
   const { favorites, removeFavorite } = useFavorites();
 
@@ -24,8 +25,9 @@ export default function FavoritesPage() {
 
   const ingredientsMap: Record<string, { amount: number; unit: string }> = {};
 
+  // Обробка інгредієнтів із використанням нового поля `ingredients`
   favorites.forEach((meal: Meal) => {
-    extractIngredients(meal).forEach(({ name, measure }) => {
+    meal?.ingredients && meal?.ingredients.forEach(({ name, measure }) => {
       if (!name || !measure) return;
 
       const normalizedName = name.trim().toLowerCase(); // Нормалізація назв
@@ -59,8 +61,8 @@ export default function FavoritesPage() {
       <h1 className={styles.title}>Обрані рецепти</h1>
       <div className={styles.content}>
         <ul className={styles.list}>
-          {favorites.map((meal: Meal) => (
-            <li key={meal.idMeal} className={styles.card}>
+          {favorites.map((meal: Meal, index:number) => (
+            <li key={meal.idMeal+index} className={styles.card}>
               <h3>{meal.strMeal}</h3>
               <img
                 className={styles.image}

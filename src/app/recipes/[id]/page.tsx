@@ -2,7 +2,6 @@
 
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { Meal } from "../../../../ interfaces/data";
 import { useMeal } from "../../../../lib/useMeal";
 
 import styles from "./page.module.scss";
