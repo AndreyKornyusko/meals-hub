@@ -5,6 +5,15 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true, // Вимикає ESLint під час збірки
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'www.themealdb.com',
+        pathname: '/images/**',
+      },
+    ],
+  },
 };
 
 export default nextConfig;
