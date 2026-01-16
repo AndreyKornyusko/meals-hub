@@ -1,3 +1,9 @@
+@import "tailwindcss";
+
+/* #region agent log - Check if Tailwind imports work */
+/* This comment verifies CSS is being processed */
+/* #endregion */
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -19,13 +25,19 @@ body {
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
+}
+
+html,
+body {
   padding: 0;
   margin: 0;
 }

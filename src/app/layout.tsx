@@ -21,7 +21,7 @@ const geistMono = Geist_Mono({
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="ua">
-      <body>
+      <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <QueryClientProvider client={queryClient}>
           {children}
         </QueryClientProvider>
